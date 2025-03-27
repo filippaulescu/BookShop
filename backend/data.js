@@ -6,7 +6,7 @@ const data = {
       category: 'Literatură clasică',
       image: '/images/mandrie_si_prejudecata.jpeg',
       price: 30.0,
-      countInStock: 15,
+      countInStock: 0,
       brand: 'Jane Austen',
       rating: 4.5,
       numReviews: 120,

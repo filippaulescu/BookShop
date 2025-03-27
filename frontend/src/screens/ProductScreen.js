@@ -1,72 +1,107 @@
+import axios from 'axios';
+import { useEffect, useReducer } from 'react';
+import Row from 'react-bootstrap/Row';
+import Col from 'react-bootstrap/Col';
 import { useParams } from 'react-router-dom';
-import data from '../data';
+import ListGroup from 'react-bootstrap/ListGroup';
+import Rating from '../components/rating';
+import Card from 'react-bootstrap/Card';
+import { Badge, Button } from 'react-bootstrap';
+
+const reducer = (state, action) => {
+  switch (action.type) {
+    case 'FETCH_REQUEST':
+      return { ...state, loading: true };
+    case 'FETCH_SUCCESS':
+      return { ...state, product: action.payload, loading: false };
+    case 'FETCH_FAIL':
+      return { ...state, loading: false, error: action.payload };
+    default:
+      return state;
+  }
+};
 
 function ProductScreen() {
-  const { slug } = useParams();
-  const product = data.products.find((p) => p.slug === slug);
+  const params = useParams();
+  const { slug } = params;
+  const [{ loading, error, product }, dispatch] = useReducer(reducer, {
+    product: [],
+    loading: true,
+    error: '',
+  });
 
-  if (!product) {
-    return (
-      <h1 className="text-center text-red-600 text-2xl mt-10">
-        Produsul nu a fost găsit!
-      </h1>
-    );
-  }
+  useEffect(() => {
+    const fetchData = async () => {
+      dispatch({ type: 'FETCH_REQUEST' });
+      try {
+        const result = await axios.get(`/api/products/slug/${slug}`);
+        dispatch({ type: 'FETCH_SUCCESS', payload: result.data });
+      } catch (err) {
+        dispatch({ type: 'FETCH_FAIL', payload: err.message });
+      }
+    };
+    fetchData();
+  }, [slug]);
 
-  return (
-    <div className="max-w-4xl mx-auto p-6 bg-gray-100 shadow-lg rounded-lg mt-10 border border-gray-300">
-      {/* Titlul produsului */}
-      <h1 className="text-4xl font-extrabold text-center text-gray-900 mb-6">
-        {product.name}
-      </h1>
-
-      <div className="flex flex-col md:flex-row bg-white p-6 rounded-lg shadow">
-        {/* Imaginea produsului */}
-        <div className="flex-shrink-0">
-          <img
-            src={product.image}
-            alt={product.name}
-            className="w-64 h-auto rounded-lg shadow-md border border-gray-300"
-          />
-        </div>
-
-        {/* Detalii produs */}
-        <div className="ml-0 md:ml-8 mt-6 md:mt-0 flex-1">
-          <p className="text-lg text-gray-700 mt-2">
-            <span className="font-bold">Categorie:</span> {product.category}
-          </p>
-          <p className="text-gray-600 mt-2">
-            <span className="font-bold">Brand:</span> {product.brand}
-          </p>
-
-          <div className="mt-4">
-            <p className="text-xl font-bold text-green-600">
-              Preț: ${product.price}
-            </p>
-            <p className="text-gray-700 mt-2">
-              <span className="font-bold">Descriere:</span>{' '}
-              {product.description}
-            </p>
-          </div>
-
-          {/* Buton de adăugare în coș */}
-          <button className="mt-6 px-6 py-3 bg-orange-500 text-white rounded-lg shadow-md hover:bg-orange-600 transition">
-            Adaugă în coș
-          </button>
-
-          {/* Secțiunea de rating */}
-          <div className="mt-6 p-4 bg-gray-200 rounded-lg shadow-inner flex flex-col items-center">
-            <p className="text-lg font-semibold text-gray-700 mb-2">Rating:</p>
-            <div className="flex space-x-1">
-              <span className="text-yellow-500 text-2xl">★</span>
-              <span className="text-yellow-500 text-2xl">★</span>
-              <span className="text-yellow-500 text-2xl">★</span>
-              <span className="text-gray-400 text-2xl">★</span>
-              <span className="text-gray-400 text-2xl">★</span>
-            </div>
-          </div>
-        </div>
-      </div>
+  return loading ? (
+    <div>Loading....</div>
+  ) : error ? (
+    <div>{error}</div>
+  ) : (
+    <div>
+      <Row>
+        <Col md={6}>
+          <img className="img-large" src={product.image} alt={product.name} />
+        </Col>
+        <Col md={3}>
+          <ListGroup variant="flush">
+            <ListGroup.Item>
+              <h1>{product.name}</h1>
+            </ListGroup.Item>
+            <ListGroup.Item>
+              <Rating rating={product.rating} numReviews={product.numReviews} />
+            </ListGroup.Item>
+            <ListGroup.Item>Preţ : ${product.price}</ListGroup.Item>
+            <ListGroup.Item>
+              Descriere:
+              <p>{product.description}</p>
+            </ListGroup.Item>
+          </ListGroup>
+        </Col>
+        <Col md={3}>
+          <Card>
+            <Card.Body>
+              <ListGroup variant="flush">
+                <ListGroup.Item>
+                  <Row>
+                    <Col>Price:</Col>
+                    <Col>{product.price}</Col>
+                  </Row>
+                </ListGroup.Item>
+                <ListGroup.Item>
+                  <Row>
+                    <Col>Status:</Col>
+                    <Col>
+                      {product.countInStock > 0 ? (
+                        <Badge bg="success"> In stoc</Badge>
+                      ) : (
+                        <Badge bg="danger">Indisponibil</Badge>
+                      )}
+                    </Col>
+                  </Row>
+                </ListGroup.Item>
+                {product.countInStock > 0 && (
+                  <ListGroup.Item>
+                    <div className="d-grid">
+                      <Button variant="primary">Add to Cart</Button>
+                    </div>
+                  </ListGroup.Item>
+                )}
+              </ListGroup>
+            </Card.Body>
+          </Card>
+        </Col>
+      </Row>
     </div>
   );
 }
