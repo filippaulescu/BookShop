@@ -1,10 +1,10 @@
-//import data from '../data';
+import { useEffect } from 'react';
 import axios from 'axios';
-import { useEffect, useReducer, useState } from 'react';
-//import logger from 'use-reducer-logger';
+import { useReducer } from 'react';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Product from '../components/product';
+import useSEO from '../hooks/useSEO'; // Adaugă acest import
 
 const reducer = (state, action) => {
   switch (action.type) {
@@ -26,7 +26,9 @@ function HomeScreen() {
     error: '',
   });
 
-  //const [products, setProducts] = useState([]);
+  // Adaugă acest hook pentru SEO
+  useSEO({});
+
   useEffect(() => {
     const fetchData = async () => {
       dispatch({ type: 'FETCH_REQUEST' });
@@ -36,14 +38,13 @@ function HomeScreen() {
       } catch (err) {
         dispatch({ type: 'FETCH_FAIL', payload: err.message });
       }
-
-      //setProducts(result.data);
     };
     fetchData();
-  }, []); 
+  }, []);
+
   return (
     <div>
-      <h1>Carti</h1>
+      <h1>Cărți</h1>
       <div className="products">
         <Row>
           {products.map((product) => (
@@ -56,4 +57,5 @@ function HomeScreen() {
     </div>
   );
 }
+
 export default HomeScreen;

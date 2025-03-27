@@ -7,6 +7,7 @@ import ListGroup from 'react-bootstrap/ListGroup';
 import Rating from '../components/rating';
 import Card from 'react-bootstrap/Card';
 import { Badge, Button } from 'react-bootstrap';
+import useSEO from '../hooks/useSEO'; // Adaugă acest import
 
 const reducer = (state, action) => {
   switch (action.type) {
@@ -28,6 +29,12 @@ function ProductScreen() {
     product: [],
     loading: true,
     error: '',
+  });
+
+  // Adaugă acest hook pentru SEO
+  useSEO({
+    title: product?.name, // Titlul produsului
+    metaDescription: product?.description
   });
 
   useEffect(() => {
