@@ -68,12 +68,12 @@ function ProductScreen() {
     }
   }, [product]);
 
-  const addToCartHandler = () => {
+  const addToCartHandler = async () => {
     const existItem = cart.cartItems.find((x) => x._id === product._id);
     const quantity = existItem ? existItem.quantity + 1 : 1; // <- Această logică e crucială
-
-    if (product.countInStock < quantity) {
-      alert('Stoc epuizat');
+    const { data } = await axios.get(`/api/products/${product._id}`);
+    if (data.countInStock < quantity) {
+      window.alert('Stoc epuizat');
       return;
     }
 
@@ -102,9 +102,9 @@ function ProductScreen() {
             <ListGroup.Item>
               <Rating rating={product.rating} numReviews={product.numReviews} />
             </ListGroup.Item>
-            <ListGroup.Item>Price: ${product.price}</ListGroup.Item>
+            <ListGroup.Item>Preţ: ${product.price}</ListGroup.Item>
             <ListGroup.Item>
-              Description:
+              Desciere:
               <p>{product.description}</p>
             </ListGroup.Item>
           </ListGroup>
@@ -115,7 +115,7 @@ function ProductScreen() {
               <ListGroup variant="flush">
                 <ListGroup.Item>
                   <Row>
-                    <Col>Price:</Col>
+                    <Col>Preţ:</Col>
                     <Col>${product.price}</Col>
                   </Row>
                 </ListGroup.Item>
@@ -124,9 +124,9 @@ function ProductScreen() {
                     <Col>Status:</Col>
                     <Col>
                       {product.countInStock > 0 ? (
-                        <Badge bg="success">In Stock</Badge>
+                        <Badge bg="success">Disponibil</Badge>
                       ) : (
-                        <Badge bg="danger">Unavailable</Badge>
+                        <Badge bg="danger">Indisponibil</Badge>
                       )}
                     </Col>
                   </Row>
@@ -135,7 +135,7 @@ function ProductScreen() {
                   <ListGroup.Item>
                     <div className="d-grid">
                       <Button onClick={addToCartHandler} variant="primary">
-                        Add to Cart
+                        Adaugă în coş
                       </Button>
                     </div>
                   </ListGroup.Item>

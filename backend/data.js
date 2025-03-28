@@ -1,6 +1,7 @@
 const data = {
   products: [
     {
+      _id: '1',
       name: 'Mândrie și prejudecată',
       slug: 'mandrie-si-prejudecata',
       category: 'Literatură clasică',
@@ -14,6 +15,7 @@ const data = {
         'Un roman clasic despre dragoste, diferențele sociale și prejudecăți.',
     },
     {
+      _id: '2',
       name: '1984',
       slug: '1984',
       category: 'Ficțiune distopică',
@@ -27,6 +29,7 @@ const data = {
         'Un roman care explorează totalitarismul, supravegherea și controlul social.',
     },
     {
+      _id: '3',
       name: 'The Catcher in the Rye',
       slug: 'the-catcher-in-the-rye',
       category: 'Ficțiune modernă',
@@ -40,6 +43,7 @@ const data = {
         'O poveste despre adolescența turbulentă și alienarea socială.',
     },
     {
+      _id: '4',
       name: 'Harry Potter și piatra filosofală',
       slug: 'harry-potter-si-piatra-filosofala',
       category: 'Fantasy',

@@ -31,7 +31,7 @@ function App() {
                 className="nav-link"
                 style={{ position: 'relative' }}
               >
-                Cart
+                Coş
                 {cartItemsCount > 0 && (
                   <Badge
                     pill
@@ -43,7 +43,7 @@ function App() {
                       fontSize: '0.75rem',
                     }}
                   >
-                    {cartItemsCount}
+                    {cart.cartItems.reduce((a, c) => a + c.quantity, 0)}
                   </Badge>
                 )}
               </Link>
