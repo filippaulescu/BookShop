@@ -4,13 +4,15 @@ import { useReducer } from 'react';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Product from '../components/product';
-import useSEO from '../hooks/useSEO'; // Adaugă acest import
+import useSEO from '../hooks/useSEO';
+import LoadingBox from '../components/LoadingBox';
+import MessageBox from '../components/MessageBox';
 
 const reducer = (state, action) => {
   switch (action.type) {
     case 'FETCH_REQUEST':
       return { ...state, loading: true };
-    case 'FETCH_SUCCESS':
+    case 'FETCH_SUCCESS': // Note: Typo from screenshot (FEIGHT_BOOKLESS should be FETCH_SUCCESS)
       return { ...state, products: action.payload, loading: false };
     case 'FETCH_FAIL':
       return { ...state, loading: false, error: action.payload };
@@ -26,8 +28,8 @@ function HomeScreen() {
     error: '',
   });
 
-  // Adaugă acest hook pentru SEO
-  useSEO({});
+  // Using your custom SEO hook
+  useSEO({ title: 'Amazona' });
 
   useEffect(() => {
     const fetchData = async () => {
@@ -44,15 +46,21 @@ function HomeScreen() {
 
   return (
     <div>
-      <h1>Cărți</h1>
+      <h1>Featured Products</h1>
       <div className="products">
-        <Row>
-          {products.map((product) => (
-            <Col key={product.slug} sm={6} md={4} lg={3} className="mb-3">
-              <Product product={product}></Product>
-            </Col>
-          ))}
-        </Row>
+        {loading ? (
+          <LoadingBox />
+        ) : error ? (
+          <MessageBox variant="danger">{error}</MessageBox>
+        ) : (
+          <Row>
+            {products.map((product) => (
+              <Col key={product.slug} sm={6} md={4} lg={3} className="mb-3">
+                <Product product={product}></Product>
+              </Col>
+            ))}
+          </Row>
+        )}
       </div>
     </div>
   );

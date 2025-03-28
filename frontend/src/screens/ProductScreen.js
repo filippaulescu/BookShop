@@ -8,6 +8,9 @@ import Rating from '../components/rating';
 import Card from 'react-bootstrap/Card';
 import { Badge, Button } from 'react-bootstrap';
 import useSEO from '../hooks/useSEO'; // Adaugă acest import
+import LoadingBox from '../components/LoadingBox';
+import MessageBox from '../components/MessageBox';
+import { getError } from '../utils';
 
 const reducer = (state, action) => {
   switch (action.type) {
@@ -34,7 +37,7 @@ function ProductScreen() {
   // Adaugă acest hook pentru SEO
   useSEO({
     title: product?.name, // Titlul produsului
-    metaDescription: product?.description
+    metaDescription: product?.description,
   });
 
   useEffect(() => {
@@ -44,16 +47,16 @@ function ProductScreen() {
         const result = await axios.get(`/api/products/slug/${slug}`);
         dispatch({ type: 'FETCH_SUCCESS', payload: result.data });
       } catch (err) {
-        dispatch({ type: 'FETCH_FAIL', payload: err.message });
+        dispatch({ type: 'FETCH_FAIL', payload: getError(err) });
       }
     };
     fetchData();
   }, [slug]);
 
   return loading ? (
-    <div>Loading....</div>
+    <LoadingBox />
   ) : error ? (
-    <div>{error}</div>
+    <MessageBox variant="danger">{error}</MessageBox>
   ) : (
     <div>
       <Row>
