@@ -29,7 +29,7 @@ function HomeScreen() {
   });
 
   // Using your custom SEO hook
-  useSEO({ title: 'Amazona' });
+  useSEO({ title: 'BookShop' });
 
   useEffect(() => {
     const fetchData = async () => {

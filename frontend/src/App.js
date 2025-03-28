@@ -3,8 +3,20 @@ import HomeScreen from './screens/HomeScreen';
 import ProductScreen from './screens/ProductScreen';
 import Navbar from 'react-bootstrap/Navbar';
 import Container from 'react-bootstrap/Container';
+import { Badge, Nav } from 'react-bootstrap';
+import { useContext } from 'react';
+import { Store } from './screens/Store';
 
 function App() {
+  const { state } = useContext(Store);
+  const { cart } = state;
+
+  // Calculează suma totală a cantităților din coș
+  const cartItemsCount = cart.cartItems.reduce(
+    (sum, item) => sum + item.quantity,
+    0
+  );
+
   return (
     <div className="d-flex flex-column site-container">
       <header>
@@ -13,6 +25,29 @@ function App() {
             <Navbar.Brand as={Link} to="/">
               BookShop
             </Navbar.Brand>
+            <Nav className="me-auto">
+              <Link
+                to="/cart"
+                className="nav-link"
+                style={{ position: 'relative' }}
+              >
+                Cart
+                {cartItemsCount > 0 && (
+                  <Badge
+                    pill
+                    bg="danger"
+                    style={{
+                      position: 'absolute',
+                      top: '-8px',
+                      right: '-8px',
+                      fontSize: '0.75rem',
+                    }}
+                  >
+                    {cartItemsCount}
+                  </Badge>
+                )}
+              </Link>
+            </Nav>
           </Container>
         </Navbar>
       </header>

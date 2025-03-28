@@ -1,10 +1,12 @@
+// hooks/useSEO.js
 import { useEffect } from 'react';
 
-const useSEO = ({ title }) => {
+// Exemplu corect de implementare useSEO
+const useSEO = ({ title, description }) => {
   useEffect(() => {
-    // Afișează DOAR titlul primit sau "BookShop" dacă title este undefined
-    document.title = title || 'BookShop';
-  }, [title]);
+    if (title) document.title = title;
+    // ... alte operații SEO
+  }, [title, description]);
 };
 
 export default useSEO;
