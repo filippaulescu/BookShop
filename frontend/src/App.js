@@ -5,13 +5,22 @@ import Navbar from 'react-bootstrap/Navbar';
 import Container from 'react-bootstrap/Container';
 import { Badge, Nav } from 'react-bootstrap';
 import { useContext } from 'react';
-import { Store } from './screens/Store';
+import { StoreContext } from './contexts/Store'; // Changed from Store to StoreContext
+import CartScreen from './screens/CartScreen';
+import { StoreProvider } from './contexts/Store'; // Add StoreProvider import
+
+function AppWrapper() {
+  return (
+    <StoreProvider>
+      <App />
+    </StoreProvider>
+  );
+}
 
 function App() {
-  const { state } = useContext(Store);
+  const { state } = useContext(StoreContext);
   const { cart } = state;
 
-  // Calculează suma totală a cantităților din coș
   const cartItemsCount = cart.cartItems.reduce(
     (sum, item) => sum + item.quantity,
     0
@@ -43,7 +52,7 @@ function App() {
                       fontSize: '0.75rem',
                     }}
                   >
-                    {cart.cartItems.reduce((a, c) => a + c.quantity, 0)}
+                    {cartItemsCount}
                   </Badge>
                 )}
               </Link>
@@ -56,6 +65,8 @@ function App() {
           <Routes>
             <Route path="/product/:slug" element={<ProductScreen />} />
             <Route path="/" element={<HomeScreen />} />
+            <Route path="/cart" element={<CartScreen />} />
+            <Route path="/cart/:id" element={<CartScreen />} />
           </Routes>
         </Container>
       </main>
@@ -66,4 +77,4 @@ function App() {
   );
 }
 
-export default App;
+export default AppWrapper; // Export AppWrapper instead of App
