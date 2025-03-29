@@ -1,17 +1,16 @@
 import { useContext } from 'react';
-import { StoreContext } from '../contexts/Store'; // Corect - folosim StoreContext
+import { StoreContext } from '../contexts/Store';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import MessageBox from '../components/MessageBox';
 import ListGroup from 'react-bootstrap/ListGroup';
 import Button from 'react-bootstrap/Button';
 import Card from 'react-bootstrap/Card';
-import { Link, useNavigate, useNavigationType } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import useSEO from '../hooks/useSEO';
 import axios from 'axios';
 
 export default function CartScreen() {
-  // Schimbă Store în StoreContext aici
   const navigate = useNavigate();
   const { state, dispatch: ctxDispatch } = useContext(StoreContext);
   const {
@@ -46,8 +45,9 @@ export default function CartScreen() {
   };
 
   const checkoutHandler = () => {
-    navigate('/signin?redirect=/shipping');
+    navigate('/signin?redirect=/shipping'); // Modifică această linie
   };
+
   return (
     <div>
       <h1>Shopping Cart</h1>
@@ -116,16 +116,14 @@ export default function CartScreen() {
                 </ListGroup.Item>
                 <ListGroup.Item>
                   <div className="d-grid">
-                    <Link to="/login?redirect=/shipping">
-                      <Button
-                        type="button"
-                        variant="primary"
-                        onClick={checkoutHandler}
-                        disabled={cartItems.length === 0}
-                      >
-                        Proceed to Checkout
-                      </Button>
-                    </Link>
+                    <Button
+                      type="button"
+                      variant="primary"
+                      onClick={checkoutHandler}
+                      disabled={cartItems.length === 0}
+                    >
+                      Proceed to Checkout
+                    </Button>
                   </div>
                 </ListGroup.Item>
               </ListGroup>

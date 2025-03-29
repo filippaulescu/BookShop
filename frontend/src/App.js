@@ -8,6 +8,7 @@ import { useContext } from 'react';
 import { StoreContext } from './contexts/Store'; // Changed from Store to StoreContext
 import CartScreen from './screens/CartScreen';
 import { StoreProvider } from './contexts/Store'; // Add StoreProvider import
+import SigninScreen from './screens/SigninScreen';
 
 function AppWrapper() {
   return (
@@ -63,9 +64,9 @@ function App() {
       <main>
         <Container className="mt-3">
           <Routes>
-            <Route path="/product/:slug" element={<ProductScreen />} />
             <Route path="/" element={<HomeScreen />} />
             <Route path="/cart" element={<CartScreen />} />
+            <Route path="/signin" element={<SigninScreen />} />
             <Route path="/cart/:id" element={<CartScreen />} />
           </Routes>
         </Container>

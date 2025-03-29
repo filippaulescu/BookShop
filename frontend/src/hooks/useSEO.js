@@ -1,17 +1,29 @@
 // src/hooks/useSEO.js
 import { useEffect } from 'react';
-import { useContext } from 'react';
-import { StoreContext } from '../contexts/Store'; // PROBLEMA ESTE AICI!
 
 export default function useSEO({ title, description }) {
-  const { state } = useContext(StoreContext); // ACEASTĂ LINIE CAUZEAZĂ RECURSIVITATEA
-
   useEffect(() => {
-    if (title) document.title = title;
-
-    const metaDescription = document.querySelector('meta[name="description"]');
-    if (metaDescription && description) {
-      metaDescription.content = description;
+    if (title) {
+      document.title = title;
     }
-  }, [title, description, state]); // DEPENDENȚA DE 'state' E PROBLEMATICĂ
+
+    // Gestionează meta description
+    let metaTag = document.querySelector('meta[name="description"]');
+    if (!metaTag && description) {
+      metaTag = document.createElement('meta');
+      metaTag.name = 'description';
+      document.head.appendChild(metaTag);
+    }
+    if (metaTag && description) {
+      metaTag.content = description;
+    }
+
+    // Cleanup la unmount
+    return () => {
+      document.title = 'BookShop'; // Titlul implicit
+      if (metaTag) {
+        metaTag.content = ''; // Resetează description
+      }
+    };
+  }, [title, description]); // Elimină dependența de context
 }
