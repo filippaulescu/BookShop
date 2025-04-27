@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './index.css';
-import App from './App';
+import AppWrapper from './App';
 import reportWebVitals from './reportWebVitals';
 import { StoreProvider } from './contexts/Store';
 
@@ -12,7 +12,7 @@ root.render(
   <React.StrictMode>
     <StoreProvider>
       <BrowserRouter>
-        <App />
+        <AppWrapper />
       </BrowserRouter>
     </StoreProvider>
   </React.StrictMode>

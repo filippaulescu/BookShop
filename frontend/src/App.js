@@ -1,14 +1,15 @@
-import { Routes, Route, Link } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
 import HomeScreen from './screens/HomeScreen';
 import ProductScreen from './screens/ProductScreen';
 import Navbar from 'react-bootstrap/Navbar';
 import Container from 'react-bootstrap/Container';
-import { Badge, Nav } from 'react-bootstrap';
-import { useContext } from 'react';
+import { Badge, Nav, NavDropdown } from 'react-bootstrap';
+import { useContext, useEffect } from 'react';
 import { StoreContext } from './contexts/Store'; // Changed from Store to StoreContext
 import CartScreen from './screens/CartScreen';
 import { StoreProvider } from './contexts/Store'; // Add StoreProvider import
 import SigninScreen from './screens/SigninScreen';
+import { LinkContainer } from 'react-router-bootstrap';
 
 function AppWrapper() {
   return (
@@ -19,13 +20,25 @@ function AppWrapper() {
 }
 
 function App() {
-  const { state } = useContext(StoreContext);
-  const { cart } = state;
+  const { state, dispatch } = useContext(StoreContext);
+  const { cart, userInfo } = state;
+
+  useEffect(() => {
+    const storedUser = localStorage.getItem('userInfo');
+    if (storedUser) {
+      dispatch({ type: 'USER_SIGNIN', payload: JSON.parse(storedUser) });
+    }
+  }, [dispatch]);
 
   const cartItemsCount = cart.cartItems.reduce(
     (sum, item) => sum + item.quantity,
     0
   );
+  const signoutHandler = () => {
+    dispatch({ type: 'USER_SIGNOUT' });
+    localStorage.removeItem('userInfo');
+    localStorage.removeItem('shippingAddress');
+  };
 
   return (
     <div className="d-flex flex-column site-container">
@@ -57,6 +70,28 @@ function App() {
                   </Badge>
                 )}
               </Link>
+              {userInfo ? (
+                <NavDropdown title={userInfo.name} id="basic-nav-dropdown">
+                  <NavDropdown.Item as={Link} to="/profile">
+                    User Profile
+                  </NavDropdown.Item>
+                  <NavDropdown.Item as={Link} to="/orderhistory">
+                    Order History
+                  </NavDropdown.Item>
+                  <NavDropdown.Divider />
+                  <Link
+                    className="dropdown-item"
+                    to="#signout"
+                    onClick={signoutHandler}
+                  >
+                    Sign Out
+                  </Link>
+                </NavDropdown>
+              ) : (
+                <Link className="nav-link" to="/signin">
+                  Sign In
+                </Link>
+              )}
             </Nav>
           </Container>
         </Navbar>

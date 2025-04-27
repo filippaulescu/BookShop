@@ -9,13 +9,18 @@ productRouter.get('/', async (req, res) => {
 });
 
 // Ruta pentru găsire produs după slug (URL prietenos)
-productRouter.get('/slug/:slug', async (req, res) => {
-  // Schimbat din :slugon în :slug
-  const product = await Product.findOne({ slug: req.params.slug }); // Adăugat {} și corectat parametrul
-  if (product) {
-    res.send(product);
-  } else {
-    res.status(404).send({ message: 'Produsul nu este disponibil' });
+// Ruta pentru găsire produs după ID
+productRouter.get('/:id', async (req, res) => {
+  try {
+    const product = await Product.findById(req.params.id);
+    if (product) {
+      res.send(product);
+    } else {
+      res.status(404).send({ message: 'Produsul nu este disponibil' });
+    }
+  } catch (error) {
+    console.error('Error fetching product by ID:', error);
+    res.status(500).send({ message: 'Server error: ' + error.message });
   }
 });
 

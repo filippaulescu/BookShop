@@ -2,17 +2,22 @@
 import { createContext, useReducer } from 'react';
 
 const initialState = {
+  userInfo: localStorage.getItem('userInfo')
+    ? JSON.parse(localStorage.getItem('userInfo'))
+    : null,
   cart: {
     cartItems: localStorage.getItem('cartItems')
       ? JSON.parse(localStorage.getItem('cartItems'))
       : [],
+    shippingAddress: localStorage.getItem('shippingAddress')
+      ? JSON.parse(localStorage.getItem('shippingAddress'))
+      : {},
   },
 };
 
 function reducer(state, action) {
   switch (action.type) {
-    case 'CART_ADD_ITEM':
-      // Adaugă un nou item sau actualizează cantitatea
+    case 'CART_ADD_ITEM': {
       const newItem = action.payload;
       const existItem = state.cart.cartItems.find(
         (item) => item._id === newItem._id
@@ -24,14 +29,35 @@ function reducer(state, action) {
         : [...state.cart.cartItems, newItem];
       localStorage.setItem('cartItems', JSON.stringify(cartItems));
       return { ...state, cart: { ...state.cart, cartItems } };
+    }
 
-    case 'CART_REMOVE_ITEM':
-      // Elimină item din coș
+    case 'CART_REMOVE_ITEM': {
       const filteredItems = state.cart.cartItems.filter(
         (item) => item._id !== action.payload._id
       );
       localStorage.setItem('cartItems', JSON.stringify(filteredItems));
       return { ...state, cart: { ...state.cart, cartItems: filteredItems } };
+    }
+
+    case 'USER_SIGNIN':
+      localStorage.setItem('userInfo', JSON.stringify(action.payload));
+      return { ...state, userInfo: action.payload };
+
+    case 'USER_SIGNOUT':
+      localStorage.removeItem('userInfo');
+      localStorage.removeItem('shippingAddress');
+      return {
+        ...state,
+        userInfo: null,
+        cart: { ...state.cart, shippingAddress: {} },
+      };
+
+    case 'SAVE_SHIPPING_ADDRESS':
+      localStorage.setItem('shippingAddress', JSON.stringify(action.payload));
+      return {
+        ...state,
+        cart: { ...state.cart, shippingAddress: action.payload },
+      };
 
     default:
       return state;
@@ -42,8 +68,9 @@ export const StoreContext = createContext();
 
 export function StoreProvider({ children }) {
   const [state, dispatch] = useReducer(reducer, initialState);
-  const value = { state, dispatch };
   return (
-    <StoreContext.Provider value={value}>{children}</StoreContext.Provider>
+    <StoreContext.Provider value={{ state, dispatch }}>
+      {children}
+    </StoreContext.Provider>
   );
 }
