@@ -25,8 +25,18 @@ productRouter.get('/:id', async (req, res) => {
 });
 
 // Ruta pentru găsire produs după ID
+/*
 productRouter.get('/:id', async (req, res) => {
   const product = await Product.findById(req.params.id); // Corectat findByID în findById
+  if (product) {
+    res.send(product);
+  } else {
+    res.status(404).send({ message: 'Produsul nu este disponibil' });
+  }
+});
+*/
+productRouter.get('/slug/:slug', async (req, res) => {
+  const product = await Product.findOne({ slug: req.params.slug });
   if (product) {
     res.send(product);
   } else {
