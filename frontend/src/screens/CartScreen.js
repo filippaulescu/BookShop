@@ -45,7 +45,12 @@ export default function CartScreen() {
   };
 
   const checkoutHandler = () => {
-    navigate('/signin?redirect=/shipping'); // Modifică această linie
+    // Verifică dacă userInfo există în state
+    if (state.userInfo) {
+      navigate('/shipping');
+    } else {
+      navigate('/signin?redirect=/shipping');
+    }
   };
 
   return (

@@ -10,6 +10,10 @@ import CartScreen from './screens/CartScreen';
 import { StoreProvider } from './contexts/Store'; // Add StoreProvider import
 import SigninScreen from './screens/SigninScreen';
 import { LinkContainer } from 'react-router-bootstrap';
+import SignupScreen from './screens/SignupScreen';
+import ShippingAddressScreen from './screens/ShippingAddressScreen.js';
+import PaymentMethodScreen from './screens/PaymentMethodScreen.js';
+import PlaceOrderScreen from './screens/PlaceOrderScreen.js';
 
 function AppWrapper() {
   return (
@@ -104,6 +108,10 @@ function App() {
             <Route path="/signin" element={<SigninScreen />} />
             <Route path="/cart/:id" element={<CartScreen />} />
             <Route path="/product/:slug" element={<ProductScreen />} />
+            <Route path="/signup" element={<SignupScreen />} />
+            <Route path="/shipping" element={<ShippingAddressScreen />} />
+            <Route path="/payment" element={<PaymentMethodScreen />} />
+            <Route path="/placeorder" element={<PlaceOrderScreen />} />
           </Routes>
         </Container>
       </main>
