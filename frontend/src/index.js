@@ -6,13 +6,16 @@ import './index.css';
 import AppWrapper from './App';
 import reportWebVitals from './reportWebVitals';
 import { StoreProvider } from './contexts/Store';
+import { PayPalScriptProvider } from '@paypal/react-paypal-js';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
     <StoreProvider>
       <BrowserRouter>
-        <AppWrapper />
+        <PayPalScriptProvider deferLoading={true}>
+          <AppWrapper />
+        </PayPalScriptProvider>
       </BrowserRouter>
     </StoreProvider>
   </React.StrictMode>
