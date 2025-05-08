@@ -1,32 +1,35 @@
-import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
+import { Routes, Route, Link } from 'react-router-dom';
 import HomeScreen from './screens/HomeScreen';
 import ProductScreen from './screens/ProductScreen';
 import Navbar from 'react-bootstrap/Navbar';
 import Container from 'react-bootstrap/Container';
 import { Badge, Nav, NavDropdown } from 'react-bootstrap';
 import { useContext, useEffect } from 'react';
-import { StoreContext } from './contexts/Store'; // Changed from Store to StoreContext
+import { StoreContext } from './contexts/Store';
 import CartScreen from './screens/CartScreen';
-import { StoreProvider } from './contexts/Store'; // Add StoreProvider import
 import SigninScreen from './screens/SigninScreen';
-import { LinkContainer } from 'react-router-bootstrap';
+// Am eliminat importul LinkContainer
+// import { LinkContainer } from 'react-router-bootstrap';
 import SignupScreen from './screens/SignupScreen';
 import ShippingAddressScreen from './screens/ShippingAddressScreen.js';
 import PaymentMethodScreen from './screens/PaymentMethodScreen.js';
 import PlaceOrderScreen from './screens/PlaceOrderScreen.js';
 import OrderScreen from './screens/OrderScreen.js';
+import OrderHistoryScreen from './screens/OrderHistoryScreen';
+import ProfileScreen from './screens/UserProfileScreen.js';
+import ErrorBoundary from './components/ErrorBoundary';
 
-function AppWrapper() {
-  return (
-    <StoreProvider>
-      <App />
-    </StoreProvider>
-  );
-}
+// Notice: BrowserRouter import removed from here
 
-function App() {
+export default function App() {
   const { state, dispatch } = useContext(StoreContext);
   const { cart, userInfo } = state;
+
+  // Calculate cart items count
+  const cartItemsCount = cart.cartItems.reduce(
+    (sum, item) => sum + item.quantity,
+    0
+  );
 
   useEffect(() => {
     const storedUser = localStorage.getItem('userInfo');
@@ -35,10 +38,6 @@ function App() {
     }
   }, [dispatch]);
 
-  const cartItemsCount = cart.cartItems.reduce(
-    (sum, item) => sum + item.quantity,
-    0
-  );
   const signoutHandler = () => {
     dispatch({ type: 'USER_SIGNOUT' });
     localStorage.removeItem('userInfo');
@@ -48,56 +47,48 @@ function App() {
   return (
     <div className="d-flex flex-column site-container">
       <header>
-        <Navbar bg="dark" variant="dark">
+        <Navbar bg="dark" variant="dark" expand="lg">
           <Container>
             <Navbar.Brand as={Link} to="/">
               BookShop
             </Navbar.Brand>
-            <Nav className="me-auto">
-              <Link
-                to="/cart"
-                className="nav-link"
-                style={{ position: 'relative' }}
-              >
-                Coş
-                {cartItemsCount > 0 && (
-                  <Badge
-                    pill
-                    bg="danger"
-                    style={{
-                      position: 'absolute',
-                      top: '-8px',
-                      right: '-8px',
-                      fontSize: '0.75rem',
-                    }}
-                  >
-                    {cartItemsCount}
-                  </Badge>
-                )}
-              </Link>
-              {userInfo ? (
-                <NavDropdown title={userInfo.name} id="basic-nav-dropdown">
-                  <NavDropdown.Item as={Link} to="/profile">
-                    User Profile
-                  </NavDropdown.Item>
-                  <NavDropdown.Item as={Link} to="/orderhistory">
-                    Order History
-                  </NavDropdown.Item>
-                  <NavDropdown.Divider />
-                  <Link
-                    className="dropdown-item"
-                    to="#signout"
-                    onClick={signoutHandler}
-                  >
-                    Sign Out
-                  </Link>
-                </NavDropdown>
-              ) : (
-                <Link className="nav-link" to="/signin">
-                  Sign In
+            <Navbar.Toggle aria-controls="basic-navbar-nav" />
+            <Navbar.Collapse id="basic-navbar-nav">
+              <Nav className="me-auto w-100 justify-content-end">
+                <Link to="/cart" className="nav-link">
+                  Cart
+                  {cart.cartItems.length > 0 && (
+                    <Badge pill bg="danger">
+                      {cartItemsCount}
+                    </Badge>
+                  )}
                 </Link>
-              )}
-            </Nav>
+                {userInfo ? (
+                  <NavDropdown title={userInfo.name} id="basic-nav-dropdown">
+                    {/* Înlocuit LinkContainer cu NavDropdown.Item as={Link} */}
+                    <NavDropdown.Item as={Link} to="/profile">
+                      User Profile
+                    </NavDropdown.Item>
+                    {/* Înlocuit LinkContainer cu NavDropdown.Item as={Link} */}
+                    <NavDropdown.Item as={Link} to="/orderhistory">
+                      Order History
+                    </NavDropdown.Item>
+                    <NavDropdown.Divider />
+                    <Link
+                      className="dropdown-item"
+                      to="#signout"
+                      onClick={signoutHandler}
+                    >
+                      Sign Out
+                    </Link>
+                  </NavDropdown>
+                ) : (
+                  <Link className="nav-link" to="/signin">
+                    Sign In
+                  </Link>
+                )}
+              </Nav>
+            </Navbar.Collapse>
           </Container>
         </Navbar>
       </header>
@@ -113,15 +104,23 @@ function App() {
             <Route path="/shipping" element={<ShippingAddressScreen />} />
             <Route path="/payment" element={<PaymentMethodScreen />} />
             <Route path="/placeorder" element={<PlaceOrderScreen />} />
-            <Route path="/order/:id" element={<OrderScreen />}></Route>
+            <Route path="/profile" element={<ProfileScreen />} />
+            <Route path="/order/:id" element={<OrderScreen />} />
+            <Route path="/orderhistory" element={<OrderHistoryScreen />} />
+            <Route
+              path="/profile"
+              element={
+                <ErrorBoundary>
+                  <ProfileScreen />
+                </ErrorBoundary>
+              }
+            />
           </Routes>
         </Container>
       </main>
       <footer>
-        <div className="text-center"> By Filip Paulescu </div>
+        <div className="text-center">By Filip Paulescu</div>
       </footer>
     </div>
   );
 }
-
-export default AppWrapper; // Export AppWrapper instead of App

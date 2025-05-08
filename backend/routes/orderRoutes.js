@@ -19,8 +19,35 @@ orderRouter.post(
       user: req.user._id,
     });
 
+    // Actualizează stocul pentru fiecare produs din comandă
+    for (const item of req.body.orderItems) {
+      const product = await Product.findById(item._id);
+      if (product) {
+        product.countInStock = product.countInStock - item.quantity;
+        // Opțional: adaugă o verificare pentru stoc negativ
+        if (product.countInStock < 0) {
+          res.status(400).send({
+            message: `Insufficient stock for ${product.name}. Only ${
+              product.countInStock + item.quantity
+            } available.`,
+          });
+          return;
+        }
+        await product.save();
+      }
+    }
+
     const order = await newOrder.save();
     res.status(201).send({ message: 'New Order Created', order });
+  })
+);
+
+orderRouter.get(
+  '/mine',
+  isAuth,
+  expressAsyncHandler(async (req, res) => {
+    const orders = await Order.find({ user: req.user._id });
+    res.send(orders);
   })
 );
 
