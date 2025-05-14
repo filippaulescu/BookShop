@@ -6,6 +6,9 @@ import seedRouter from './routes/seedRoutes.js';
 import productRouter from './routes/productRoutes.js';
 import userRouter from './routes/userRoutes.js';
 import orderRouter from './routes/orderRoutes.js';
+// Adaugă importurile pentru modelele de date
+import Product from './models/productModel.js';
+import User from './models/userModel.js';
 
 dotenv.config();
 
@@ -31,6 +34,29 @@ app.use(express.urlencoded({ extended: true }));
 app.get('/api/keys/paypal', (req, res) => {
   res.send(process.env.PAYPAL_CLIENT_ID || 'sb');
 });
+
+// Rută temporară pentru reset - CORECTATĂ pentru Mongoose modern
+app.get('/api/reset', async (req, res) => {
+  try {
+    console.log('Resetting database...');
+
+    // Șterge produsele
+    const deletedProducts = await Product.deleteMany({});
+    console.log('Products deleted:', deletedProducts.deletedCount);
+
+    // Șterge utilizatorii
+    const deletedUsers = await User.deleteMany({});
+    console.log('Users deleted:', deletedUsers.deletedCount);
+
+    res.send(
+      `Database cleared successfully. Deleted ${deletedProducts.deletedCount} products and ${deletedUsers.deletedCount} users.`
+    );
+  } catch (error) {
+    console.error('Error deleting products/users:', error);
+    res.status(500).send('Error clearing database: ' + error.message);
+  }
+});
+
 // Rute
 app.use('/api/seed', seedRouter);
 app.use('/api/products', productRouter);

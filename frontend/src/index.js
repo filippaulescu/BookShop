@@ -17,7 +17,9 @@ import PaymentMethodScreen from './screens/PaymentMethodScreen.js';
 import PlaceOrderScreen from './screens/PlaceOrderScreen.js';
 import OrderScreen from './screens/OrderScreen.js';
 import OrderHistoryScreen from './screens/OrderHistoryScreen';
-import ProfileScreen from './screens/UserProfileScreen.js'; // Adaugă acest import
+import ProfileScreen from './screens/UserProfileScreen.js';
+import AdminScreen from './screens/AdminScreen';
+import ErrorBoundary from './components/ErrorBoundary';
 
 // Creează rutele
 const router = createBrowserRouter([
@@ -34,9 +36,17 @@ const router = createBrowserRouter([
       { path: 'shipping', element: <ShippingAddressScreen /> },
       { path: 'payment', element: <PaymentMethodScreen /> },
       { path: 'placeorder', element: <PlaceOrderScreen /> },
-      { path: 'profile', element: <ProfileScreen /> }, // Adaugă această linie
+      {
+        path: 'profile',
+        element: (
+          <ErrorBoundary>
+            <ProfileScreen />
+          </ErrorBoundary>
+        ),
+      },
       { path: 'order/:id', element: <OrderScreen /> },
       { path: 'orderhistory', element: <OrderHistoryScreen /> },
+      { path: 'admin', element: <AdminScreen /> },
     ],
   },
 ]);

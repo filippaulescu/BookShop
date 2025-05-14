@@ -1,25 +1,9 @@
-import { Routes, Route, Link } from 'react-router-dom';
-import HomeScreen from './screens/HomeScreen';
-import ProductScreen from './screens/ProductScreen';
+import { Link, Outlet } from 'react-router-dom';
 import Navbar from 'react-bootstrap/Navbar';
 import Container from 'react-bootstrap/Container';
 import { Badge, Nav, NavDropdown } from 'react-bootstrap';
 import { useContext, useEffect } from 'react';
 import { StoreContext } from './contexts/Store';
-import CartScreen from './screens/CartScreen';
-import SigninScreen from './screens/SigninScreen';
-// Am eliminat importul LinkContainer
-// import { LinkContainer } from 'react-router-bootstrap';
-import SignupScreen from './screens/SignupScreen';
-import ShippingAddressScreen from './screens/ShippingAddressScreen.js';
-import PaymentMethodScreen from './screens/PaymentMethodScreen.js';
-import PlaceOrderScreen from './screens/PlaceOrderScreen.js';
-import OrderScreen from './screens/OrderScreen.js';
-import OrderHistoryScreen from './screens/OrderHistoryScreen';
-import ProfileScreen from './screens/UserProfileScreen.js';
-import ErrorBoundary from './components/ErrorBoundary';
-
-// Notice: BrowserRouter import removed from here
 
 export default function App() {
   const { state, dispatch } = useContext(StoreContext);
@@ -65,14 +49,18 @@ export default function App() {
                 </Link>
                 {userInfo ? (
                   <NavDropdown title={userInfo.name} id="basic-nav-dropdown">
-                    {/* Înlocuit LinkContainer cu NavDropdown.Item as={Link} */}
                     <NavDropdown.Item as={Link} to="/profile">
                       User Profile
                     </NavDropdown.Item>
-                    {/* Înlocuit LinkContainer cu NavDropdown.Item as={Link} */}
                     <NavDropdown.Item as={Link} to="/orderhistory">
                       Order History
                     </NavDropdown.Item>
+                    {/* Link pentru admin - doar pentru administratori */}
+                    {userInfo.isAdmin && (
+                      <NavDropdown.Item as={Link} to="/admin">
+                        Admin Panel
+                      </NavDropdown.Item>
+                    )}
                     <NavDropdown.Divider />
                     <Link
                       className="dropdown-item"
@@ -94,28 +82,7 @@ export default function App() {
       </header>
       <main>
         <Container className="mt-3">
-          <Routes>
-            <Route path="/" element={<HomeScreen />} />
-            <Route path="/cart" element={<CartScreen />} />
-            <Route path="/signin" element={<SigninScreen />} />
-            <Route path="/cart/:id" element={<CartScreen />} />
-            <Route path="/product/:slug" element={<ProductScreen />} />
-            <Route path="/signup" element={<SignupScreen />} />
-            <Route path="/shipping" element={<ShippingAddressScreen />} />
-            <Route path="/payment" element={<PaymentMethodScreen />} />
-            <Route path="/placeorder" element={<PlaceOrderScreen />} />
-            <Route path="/profile" element={<ProfileScreen />} />
-            <Route path="/order/:id" element={<OrderScreen />} />
-            <Route path="/orderhistory" element={<OrderHistoryScreen />} />
-            <Route
-              path="/profile"
-              element={
-                <ErrorBoundary>
-                  <ProfileScreen />
-                </ErrorBoundary>
-              }
-            />
-          </Routes>
+          <Outlet /> {/* Înlocuiește Routes și toate Route cu Outlet */}
         </Container>
       </main>
       <footer>
