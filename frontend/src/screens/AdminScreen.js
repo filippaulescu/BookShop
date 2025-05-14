@@ -9,6 +9,7 @@ import Col from 'react-bootstrap/Col';
 import { toast } from 'react-toastify';
 import axios from 'axios';
 import { getError } from '../utils';
+import ImageUpload from '../components/ImageUpload';
 
 const reducer = (state, action) => {
   switch (action.type) {
@@ -30,6 +31,12 @@ const reducer = (state, action) => {
       return { ...state, loadingDelete: false };
     case 'DELETE_FAIL':
       return { ...state, loadingDelete: false };
+    case 'UPDATE_REQUEST':
+      return { ...state, loadingUpdate: true };
+    case 'UPDATE_SUCCESS':
+      return { ...state, loadingUpdate: false };
+    case 'UPDATE_FAIL':
+      return { ...state, loadingUpdate: false };
     default:
       return state;
   }
@@ -39,14 +46,17 @@ export default function AdminScreen() {
   const { state: storeState } = useContext(StoreContext);
   const { userInfo } = storeState;
 
-  const [{ loading, error, products, loadingCreate, loadingDelete }, dispatch] =
-    useReducer(reducer, {
-      loading: true,
-      error: '',
-      products: [],
-      loadingCreate: false,
-      loadingDelete: false,
-    });
+  const [
+    { loading, error, products, loadingCreate, loadingDelete, loadingUpdate },
+    dispatch,
+  ] = useReducer(reducer, {
+    loading: true,
+    error: '',
+    products: [],
+    loadingCreate: false,
+    loadingDelete: false,
+    loadingUpdate: false,
+  });
 
   // State pentru formularul de adăugare produs
   const [productData, setProductData] = useState({
@@ -58,6 +68,10 @@ export default function AdminScreen() {
     brand: 'Default Brand',
     category: 'Uncategorized',
   });
+
+  // State pentru editare
+  const [editingProduct, setEditingProduct] = useState(null);
+  const [editingId, setEditingId] = useState(null);
 
   // Încarcă lista de produse la încărcarea paginii
   useEffect(() => {
@@ -157,6 +171,50 @@ export default function AdminScreen() {
     }
   };
 
+  // Handling pentru începerea editării
+  const handleEdit = (product) => {
+    setEditingProduct({ ...product });
+    setEditingId(product._id);
+  };
+
+  // Handling pentru anularea editării
+  const handleCancelEdit = () => {
+    setEditingProduct(null);
+    setEditingId(null);
+  };
+
+  // Handling pentru salvarea modificărilor
+  const handleSaveEdit = async () => {
+    try {
+      dispatch({ type: 'UPDATE_REQUEST' });
+      await axios.put(`/api/products/admin/${editingId}`, editingProduct, {
+        headers: { Authorization: `Bearer ${userInfo.token}` },
+      });
+      dispatch({ type: 'UPDATE_SUCCESS' });
+      toast.success('Product updated successfully');
+
+      // Reset editare
+      setEditingProduct(null);
+      setEditingId(null);
+
+      // Reîncarcă lista de produse
+      const { data } = await axios.get('/api/products');
+      dispatch({ type: 'FETCH_SUCCESS', payload: data });
+    } catch (err) {
+      dispatch({ type: 'UPDATE_FAIL' });
+      toast.error(getError(err));
+    }
+  };
+
+  // Handling pentru modificarea câmpurilor la editare
+  const handleEditInputChange = (e) => {
+    const { name, value } = e.target;
+    setEditingProduct((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
   // Verifică dacă utilizatorul este admin
   if (!userInfo || !userInfo.isAdmin) {
     return (
@@ -226,20 +284,17 @@ export default function AdminScreen() {
               />
             </Form.Group>
 
-            <Form.Group className="mb-3" controlId="image">
-              <Form.Label>Image Path</Form.Label>
-              <Form.Control
-                type="text"
-                placeholder="Enter image path (e.g., /images/book.jpg)"
-                name="image"
-                value={productData.image}
-                onChange={handleInputChange}
-              />
-              <Form.Text className="text-muted">
-                Image should be placed in public/images/ folder. Example:
-                /images/book.jpg
-              </Form.Text>
-            </Form.Group>
+            {/* Înlocuiește input-ul text cu componenta ImageUpload */}
+            <ImageUpload
+              onImageUpload={(imagePath) => {
+                setProductData((prev) => ({
+                  ...prev,
+                  image: imagePath,
+                }));
+              }}
+              currentImage={productData.image}
+              userInfo={userInfo}
+            />
 
             <Form.Group className="mb-3" controlId="brand">
               <Form.Label>Brand (Author)</Form.Label>
@@ -289,7 +344,19 @@ export default function AdminScreen() {
               <tbody>
                 {products.map((product) => (
                   <tr key={product._id}>
-                    <td>{product.name}</td>
+                    <td>
+                      {editingId === product._id ? (
+                        <Form.Control
+                          type="text"
+                          name="name"
+                          value={editingProduct.name}
+                          onChange={handleEditInputChange}
+                          size="sm"
+                        />
+                      ) : (
+                        product.name
+                      )}
+                    </td>
                     <td>
                       <img
                         src={product.image}
@@ -301,17 +368,73 @@ export default function AdminScreen() {
                         }}
                       />
                     </td>
-                    <td>${product.price}</td>
-                    <td>{product.countInStock}</td>
                     <td>
-                      <Button
-                        variant="danger"
-                        size="sm"
-                        onClick={() => handleDelete(product._id)}
-                        disabled={loadingDelete}
-                      >
-                        {loadingDelete ? 'Deleting...' : 'Delete'}
-                      </Button>
+                      {editingId === product._id ? (
+                        <Form.Control
+                          type="number"
+                          name="price"
+                          value={editingProduct.price}
+                          onChange={handleEditInputChange}
+                          size="sm"
+                          min="0"
+                          step="0.01"
+                        />
+                      ) : (
+                        `${product.price}`
+                      )}
+                    </td>
+                    <td>
+                      {editingId === product._id ? (
+                        <Form.Control
+                          type="number"
+                          name="countInStock"
+                          value={editingProduct.countInStock}
+                          onChange={handleEditInputChange}
+                          size="sm"
+                          min="0"
+                        />
+                      ) : (
+                        product.countInStock
+                      )}
+                    </td>
+                    <td>
+                      {editingId === product._id ? (
+                        <div className="d-flex gap-2">
+                          <Button
+                            variant="success"
+                            size="sm"
+                            onClick={handleSaveEdit}
+                            disabled={loadingUpdate}
+                          >
+                            Save
+                          </Button>
+                          <Button
+                            variant="secondary"
+                            size="sm"
+                            onClick={handleCancelEdit}
+                          >
+                            Cancel
+                          </Button>
+                        </div>
+                      ) : (
+                        <div className="d-flex gap-2">
+                          <Button
+                            variant="primary"
+                            size="sm"
+                            onClick={() => handleEdit(product)}
+                          >
+                            Edit
+                          </Button>
+                          <Button
+                            variant="danger"
+                            size="sm"
+                            onClick={() => handleDelete(product._id)}
+                            disabled={loadingDelete}
+                          >
+                            {loadingDelete ? 'Deleting...' : 'Delete'}
+                          </Button>
+                        </div>
+                      )}
                     </td>
                   </tr>
                 ))}
