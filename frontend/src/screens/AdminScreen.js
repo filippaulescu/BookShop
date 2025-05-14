@@ -10,6 +10,7 @@ import { toast } from 'react-toastify';
 import axios from 'axios';
 import { getError } from '../utils';
 import ImageUpload from '../components/ImageUpload';
+import { Link } from 'react-router-dom';
 
 const reducer = (state, action) => {
   switch (action.type) {
@@ -227,7 +228,32 @@ export default function AdminScreen() {
 
   return (
     <Container>
-      <h1 className="my-3">Admin Panel - Product Management</h1>
+      <h1 className="my-3">Admin Panel - Management</h1>
+
+      {/* Navigation buttons pentru admin */}
+      <Row className="mb-4">
+        <Col>
+          <div className="d-flex gap-2 flex-wrap">
+            <Button
+              as={Link}
+              to="/admin/orders"
+              variant="outline-primary"
+              className="mb-2"
+            >
+              <i className="bi bi-list-check me-2"></i>
+              View All Orders
+            </Button>
+            <Button
+              variant="outline-secondary"
+              className="mb-2"
+              onClick={() => window.location.reload()}
+            >
+              <i className="bi bi-arrow-clockwise me-2"></i>
+              Refresh Products
+            </Button>
+          </div>
+        </Col>
+      </Row>
 
       <Row>
         <Col md={6}>

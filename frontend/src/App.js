@@ -26,6 +26,7 @@ export default function App() {
     dispatch({ type: 'USER_SIGNOUT' });
     localStorage.removeItem('userInfo');
     localStorage.removeItem('shippingAddress');
+    window.location.href = '/';
   };
 
   return (
