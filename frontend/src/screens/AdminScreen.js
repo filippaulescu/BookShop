@@ -244,6 +244,15 @@ export default function AdminScreen() {
               View All Orders
             </Button>
             <Button
+              as={Link}
+              to="/admin/users"
+              variant="outline-primary"
+              className="mb-2"
+            >
+              <i className="bi bi-people me-2"></i>
+              Manage Users
+            </Button>
+            <Button
               variant="outline-secondary"
               className="mb-2"
               onClick={() => window.location.reload()}

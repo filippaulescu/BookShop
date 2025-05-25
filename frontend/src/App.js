@@ -5,6 +5,7 @@ import { Badge, Nav, NavDropdown } from 'react-bootstrap';
 import { useContext, useEffect } from 'react';
 import { StoreContext } from './contexts/Store';
 
+
 export default function App() {
   const { state, dispatch } = useContext(StoreContext);
   const { cart, userInfo } = state;

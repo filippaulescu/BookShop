@@ -187,19 +187,7 @@ productRouter.post('/:id/reviews', isAuth, async (req, res) => {
       return res.status(404).send({ message: 'Product not found' });
     }
 
-    // Verifică dacă utilizatorul a lăsat deja o recenzie
-    const existingReview = await Review.findOne({
-      user: userId,
-      product: productId,
-    });
-
-    if (existingReview) {
-      return res
-        .status(400)
-        .send({ message: 'You have already reviewed this product' });
-    }
-
-    // Validări
+    // Validări simple
     if (rating < 1 || rating > 5) {
       return res
         .status(400)
@@ -212,17 +200,7 @@ productRouter.post('/:id/reviews', isAuth, async (req, res) => {
         .send({ message: 'Comment must be at least 5 characters long' });
     }
 
-    // Comentat verificarea de purchase pentru testare
-    // const userPurchase = await Order.findOne({
-    //   user: userId,
-    //   'orderItems.product': productId,
-    //   isPaid: true,
-    // });
-    // if (!userPurchase) {
-    //   return res.status(400).send({ message: 'You must purchase this product to leave a review' });
-    // }
-
-    // Creează recenzia
+    // Creează recenzia (fără verificarea existenței)
     const review = new Review({
       user: userId,
       product: productId,

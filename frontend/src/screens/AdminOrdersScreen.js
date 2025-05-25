@@ -1,11 +1,11 @@
 import React, { useContext, useEffect, useReducer } from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import LoadingBox from '../components/LoadingBox';
 import MessageBox from '../components/MessageBox';
 import { StoreContext } from '../contexts/Store';
 import { getError } from '../utils';
-import { Button, Table, Container, Badge } from 'react-bootstrap';
+import { Button, Table, Container, Badge, Row, Col } from 'react-bootstrap';
 
 const reducer = (state, action) => {
   switch (action.type) {
@@ -65,6 +65,41 @@ export default function AdminOrdersScreen() {
   return (
     <Container>
       <h1 className="my-3">Admin - All Orders</h1>
+
+      {/* Navigation buttons pentru admin */}
+      <Row className="mb-4">
+        <Col>
+          <div className="d-flex gap-2 flex-wrap">
+            <Button
+              as={Link}
+              to="/admin"
+              variant="outline-primary"
+              className="mb-2"
+            >
+              <i className="bi bi-box me-2"></i>
+              Gestionare Produse
+            </Button>
+            <Button
+              as={Link}
+              to="/admin/users"
+              variant="outline-primary"
+              className="mb-2"
+            >
+              <i className="bi bi-people me-2"></i>
+              Gestionare Utilizatori
+            </Button>
+            <Button
+              variant="outline-secondary"
+              className="mb-2"
+              onClick={() => window.location.reload()}
+            >
+              <i className="bi bi-arrow-clockwise me-2"></i>
+              Reîmprospătare
+            </Button>
+          </div>
+        </Col>
+      </Row>
+
       {loading ? (
         <LoadingBox />
       ) : error ? (

@@ -60,7 +60,7 @@ function HomeScreen() {
           <p className="lead">Descoperă lumea fascinantă a cărților</p>
           <div className="mt-4">
             <Badge bg="light" text="dark" className="mx-2 p-2">
-              Livrare gratuită peste 100 RON
+              Experienţă unică pentru cititori
             </Badge>
             <Badge bg="light" text="dark" className="mx-2 p-2">
               {products.length} cărți disponibile

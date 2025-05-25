@@ -21,6 +21,7 @@ import ProfileScreen from './screens/UserProfileScreen.js';
 import AdminScreen from './screens/AdminScreen';
 import ErrorBoundary from './components/ErrorBoundary';
 import AdminOrdersScreen from './screens/AdminOrdersScreen';
+import AdminUsersScreen from './screens/AdminUsersScreen';
 
 // Creează rutele
 const router = createBrowserRouter([
@@ -49,6 +50,7 @@ const router = createBrowserRouter([
       { path: 'orderhistory', element: <OrderHistoryScreen /> },
       { path: 'admin', element: <AdminScreen /> },
       { path: 'admin/orders', element: <AdminOrdersScreen /> },
+      { path: 'admin/users', element: <AdminUsersScreen /> },
     ],
   },
 ]);

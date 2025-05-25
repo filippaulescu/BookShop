@@ -2,8 +2,8 @@ import express from 'express';
 import User from '../models/userModel.js';
 const userRouter = express.Router();
 import bcrypt from 'bcryptjs';
-import { generateToken, isAuth } from '../utils.js';
 import expressAsyncHandler from 'express-async-handler';
+import { generateToken, isAuth, isAdmin } from '../utils.js';
 
 userRouter.post(
   '/signin',
@@ -175,5 +175,140 @@ userRouter.put(
     }
   })
 );
+
+// Obține toți utilizatorii (doar pentru admin)
+userRouter.get('/', isAuth, isAdmin, async (req, res) => {
+  try {
+    const users = await User.find({}).select('-password');
+    res.send(users);
+  } catch (error) {
+    res.status(500).send({ message: 'Server Error: ' + error.message });
+  }
+});
+
+// Obține un utilizator după ID (doar pentru admin)
+userRouter.get('/:id', isAuth, isAdmin, async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id).select('-password');
+    if (user) {
+      res.send(user);
+    } else {
+      res.status(404).send({ message: 'User not found' });
+    }
+  } catch (error) {
+    res.status(500).send({ message: 'Server Error: ' + error.message });
+  }
+});
+
+// Actualizează un utilizator (doar pentru admin)
+userRouter.put('/:id', isAuth, isAdmin, async (req, res) => {
+  try {
+    const userId = req.params.id;
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).send({ message: 'User not found' });
+    }
+
+    // Actualizează câmpurile
+    user.name = req.body.name || user.name;
+    user.email = req.body.email || user.email;
+    user.isAdmin =
+      req.body.isAdmin !== undefined ? req.body.isAdmin : user.isAdmin;
+
+    // Dacă se furnizează o parolă nouă, o actualizăm
+    if (req.body.password) {
+      user.password = bcrypt.hashSync(req.body.password, 8);
+    }
+
+    const updatedUser = await user.save();
+
+    res.send({
+      message: 'User updated successfully',
+      user: {
+        _id: updatedUser._id,
+        name: updatedUser.name,
+        email: updatedUser.email,
+        isAdmin: updatedUser.isAdmin,
+      },
+    });
+  } catch (error) {
+    res.status(500).send({ message: 'Server Error: ' + error.message });
+  }
+});
+
+// Șterge un utilizator (doar pentru admin)
+userRouter.delete('/:id', isAuth, isAdmin, async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
+
+    if (!user) {
+      return res.status(404).send({ message: 'User not found' });
+    }
+
+    // Verifică dacă se încearcă ștergerea propriului cont sau a contului super admin
+    if (user._id.toString() === req.user._id.toString()) {
+      return res
+        .status(400)
+        .send({ message: 'Cannot delete your own account' });
+    }
+
+    await User.findByIdAndDelete(req.params.id);
+    res.send({ message: 'User deleted successfully' });
+  } catch (error) {
+    res.status(500).send({ message: 'Server Error: ' + error.message });
+  }
+});
+
+userRouter.post('/admin', isAuth, isAdmin, async (req, res) => {
+  try {
+    // Verifică dacă email-ul este deja utilizat
+    const existingUser = await User.findOne({ email: req.body.email });
+    if (existingUser) {
+      return res.status(400).send({
+        message: 'Există deja un utilizator cu această adresă de email',
+      });
+    }
+
+    // Validări simple
+    if (!req.body.name || !req.body.email || !req.body.password) {
+      return res.status(400).send({
+        message: 'Toate câmpurile (nume, email, parolă) sunt obligatorii',
+      });
+    }
+
+    // Verifică dacă parola are minim 6 caractere
+    if (req.body.password.length < 6) {
+      return res.status(400).send({
+        message: 'Parola trebuie să aibă minim 6 caractere',
+      });
+    }
+
+    // Creează noul utilizator
+    const newUser = new User({
+      name: req.body.name,
+      email: req.body.email,
+      password: bcrypt.hashSync(req.body.password, 8),
+      isAdmin: req.body.isAdmin || false,
+    });
+
+    const user = await newUser.save();
+
+    res.status(201).send({
+      message: 'Utilizator creat cu succes',
+      user: {
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        isAdmin: user.isAdmin,
+      },
+    });
+  } catch (error) {
+    console.error('Error creating user:', error);
+    res.status(500).send({
+      message: 'Server Error: ' + error.message,
+    });
+  }
+});
 
 export default userRouter;
