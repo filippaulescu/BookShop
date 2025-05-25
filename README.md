@@ -230,7 +230,7 @@ Contribuțiile sunt binevenite! Te rog să urmezi acești pași:
 4. Push pe branch (`git push origin feature/AmazingFeature`)
 5. Deschide un Pull Request
 
-## 📞 Contact
+## Contact
 
 Filip Paulescu - [GitHub](https://github.com/filippaulescu)
 
@@ -238,4 +238,4 @@ Link Proiect: [https://github.com/filippaulescu/BookShop](https://github.com/fil
 
 ---
 
-⭐ Dacă acest proiect ți-a fost util, te rog să îi dai o stea pe GitHub!
+Dacă acest proiect ți-a fost util, te rog să îi dai o stea pe GitHub!
